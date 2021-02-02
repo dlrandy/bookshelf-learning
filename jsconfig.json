@@ -3,6 +3,7 @@
         "target": "esnext",
         "baseUrl": "./",
         "jsx": "react",
+        "moduleResolution": "node",
         "paths": {
             "@FE/*": ["src/FrontEnd/*"]
         }
