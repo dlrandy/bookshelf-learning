@@ -19,8 +19,12 @@ module.exports = {
         },
         ecmaVersion: 12,
         sourceType: 'module',
+        requireConfigFile: false,
     },
     settings: {
+        // 'import/parsers': {
+        //     espree: ['.js', '.jsx', '.ts', '.tsx', '.json'],
+        // },
         'import/resolver': {
             node: {
                 extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
@@ -31,7 +35,7 @@ module.exports = {
             },
         },
     },
-    plugins: ['prettier', 'react'],
+    plugins: ['@babel', 'prettier', 'react'],
     rules: {
         'prettier/prettier': ['error'],
         'import/no-dynamic-require': 0,
