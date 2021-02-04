@@ -1,4 +1,5 @@
 import 'react-hot-loader';
+import '@FE/bootstrap';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from '@FE/App';

@@ -33,7 +33,7 @@ module.exports = {
         },
         public: '',
         // setupExitSignals: "",
-        // static: "",
+        static: path.join(__dirname, '..', 'src', 'FrontEnd', 'public'),
         // stdin: "",
         // transportMode: "",
         // useLocalIp: "",

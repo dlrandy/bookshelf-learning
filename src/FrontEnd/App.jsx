@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import { hot } from 'react-hot-loader/root';
 import React from 'react';
@@ -6,6 +7,7 @@ import '@reach/dialog/styles.css';
 import { Logo } from '@FE/components/logo';
 import { Modal, ModalContents, ModalOpenButton } from '@FE/components/modal';
 import { Button, Input, FormGroup } from '@FE/components/lib';
+import { DiscoverBooksScreen as Discover } from '@FE/views/discover';
 
 function LoginForm({ onSubmit, submitButton }) {
     function handleSubmit(event) {
@@ -102,6 +104,7 @@ function App() {
                     </ModalContents>
                 </Modal>
             </div>
+            <Discover />
         </div>
     );
 }

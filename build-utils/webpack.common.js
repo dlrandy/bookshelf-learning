@@ -27,20 +27,20 @@ module.exports = {
                     // 'sass-loader',
                 ],
             },
-            // {
-            //     test: /\.(woff|woff2|eot|ttf|svg)$/,
-            //     use: {
-            //         loader: 'url-loader',
-            //     },
-            // },
-            // {
-            //     test: /\.(png|jpe?g|gif)$/i,
-            //     loader: 'url-loader',
-            //     options: {
-            //         name: '[path][name][contenthash].[ext]',
-            //         limit: 8192,
-            //     },
-            // },
+            {
+                test: /\.(woff|woff2|eot|ttf|svg)$/,
+                use: {
+                    loader: 'url-loader',
+                },
+            },
+            {
+                test: /\.(png|jpe?g|gif)$/i,
+                loader: 'url-loader',
+                options: {
+                    name: '[path][name][contenthash].[ext]',
+                    limit: 8192,
+                },
+            },
         ],
     },
     resolve: {
