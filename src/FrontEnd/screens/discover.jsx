@@ -1,4 +1,5 @@
 /* eslint-disable no-nested-ternary */
+/** @jsx jsx */
 import { jsx } from '@emotion/react';
 import React from 'react';
 

@@ -1,7 +1,11 @@
+/* eslint-disable react/jsx-props-no-spreading */
+/* eslint-disable react/no-unescaped-entities */
+/* eslint-disable no-shadow */
 /* eslint-disable react/prop-types */
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import { hot } from 'react-hot-loader/root';
 import React from 'react';
+/** @jsx jsx */
 import { jsx } from '@emotion/react';
 import { BrowserRouter as Router } from 'react-router-dom';
 
@@ -11,6 +15,8 @@ import { AuthenticatedApp } from '@FE/apps/authenticated';
 import { UnauthenticatedApp } from '@FE/apps/unauthenticated';
 import { FullPageSpinner } from '@FE/components/lib';
 import { useAsync } from '@FE/utils/hooks';
+import * as colors from './styles/colors';
+
 async function getUser() {
     let user = null;
 
@@ -44,14 +50,39 @@ function App() {
         auth.register(form).then((user) => setData(user));
     const logout = () => {
         auth.logout();
-        setUser(null);
+        setData(null);
     };
 
-    return user ? (
-        <AuthenticatedApp user={user} logout={logout} />
-    ) : (
-        <UnauthenticatedApp login={login} register={register} />
-    );
+    if (isLoading || isIdle) {
+        return <FullPageSpinner />;
+    }
+    if (isError) {
+        return (
+            <div
+                css={{
+                    color: colors.danger,
+                    height: '100vh',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                }}
+            >
+                <p>Uh oh... There's a problem. Try refreshing the app.</p>
+                <pre>{error.message}</pre>
+            </div>
+        );
+    }
+    if (isSuccess) {
+        const props = { user, login, register, logout };
+        return user ? (
+            <Router>
+                <AuthenticatedApp {...props} />
+            </Router>
+        ) : (
+            <UnauthenticatedApp {...props} />
+        );
+    }
 }
 
 export default hot(App);

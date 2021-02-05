@@ -1,15 +1,20 @@
+/* eslint-disable react/prop-types */
+/* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable no-nested-ternary */
+/** @jsx jsx */
 import { jsx } from '@emotion/react';
 import React from 'react';
 
-import Tooltip from '@reach/tooltip';
-import { FaSearch, FaTimes } from 'react-icons/fa';
+import { Routes, Route, Link, useMatch } from 'react-router-dom';
 import { Button } from '@FE/components/lib';
 
 import * as colors from '@FE/styles/colors';
 import * as mq from '@FE/styles/media-queries';
 
-import { DiscoverBooksScreen } from '@FE/views/discover';
+import { DiscoverBooksScreen } from '@FE/screens/discover';
+import { BookScreen } from '@FE/screens/books';
+import { NotFoundScreen } from '@FE/screens/not-found';
+
 function AuthenticatedApp({ user, logout }) {
     return (
         <React.Fragment>
@@ -47,9 +52,88 @@ function AuthenticatedApp({ user, logout }) {
                     },
                 }}
             >
-                <DiscoverBooksScreen />
+                <div css={{ position: 'relative' }}>
+                    <Nav />
+                </div>
+                <main css={{ width: '100%' }}>
+                    <AppRoutes user={user} />
+                </main>
             </div>
         </React.Fragment>
+    );
+}
+function NavLink({ to, ...otherProps }) {
+    const match = useMatch(to);
+    return (
+        <Link
+            css={[
+                {
+                    display: 'block',
+                    padding: '8px 15px 8px 10px',
+                    margin: '5px 0',
+                    width: '100%',
+                    height: '100%',
+                    color: colors.text,
+                    borderRadius: '2px',
+                    borderLeft: '5px solid transparent',
+                    ':hover': {
+                        color: colors.indigo,
+                        textDecoration: 'none',
+                        background: colors.gray10,
+                    },
+                },
+                match
+                    ? {
+                          borderLeft: `5px solid ${colors.indigo}`,
+                          background: colors.gray10,
+                          ':hover': {
+                              background: colors.gray10,
+                          },
+                      }
+                    : null,
+            ]}
+            {...otherProps}
+        />
+    );
+}
+function Nav() {
+    return (
+        <nav
+            css={{
+                position: 'sticky',
+                top: '4px',
+                padding: '1em 1.5em',
+                border: `1px solid ${colors.gray10}`,
+                borderRadius: '3px',
+                [mq.small]: {
+                    position: 'static',
+                    top: 'auto',
+                },
+            }}
+        >
+            <ul
+                css={{
+                    listStyle: 'none',
+                    padding: '0',
+                }}
+            >
+                <li>
+                    <NavLink to="/discover">Discover</NavLink>
+                </li>
+            </ul>
+        </nav>
+    );
+}
+function AppRoutes({ user }) {
+    return (
+        <Routes>
+            <Route
+                path="/discover"
+                element={<DiscoverBooksScreen user={user} />}
+            />
+            <Route path="/book/:bookId" element={<BookScreen user={user} />} />
+            <Route path="*" element={<NotFoundScreen />} />
+        </Routes>
     );
 }
 

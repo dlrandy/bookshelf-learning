@@ -19,14 +19,17 @@ module.exports = {
         },
         ecmaVersion: 12,
         sourceType: 'module',
-        requireConfigFile: false,
+        babelOptions: {
+            configFile: './.babelrc',
+        },
     },
     settings: {
-        // 'import/parsers': {
-        //     espree: ['.js', '.jsx', '.ts', '.tsx', '.json'],
-        // },
+        'import/parsers': {
+            '@babel/eslint-parser': ['.js', '.jsx', '.json'],
+        },
         'import/resolver': {
             node: {
+                moduleDirectory: ['node_modules', 'src/'],
                 extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
             },
             alias: {
@@ -34,8 +37,9 @@ module.exports = {
                 extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
             },
         },
+        'import/extensions': ['.js', '.jsx', '.ts', '.tsx', '.json'],
     },
-    plugins: ['@babel', 'prettier', 'react'],
+    plugins: ['prettier', 'react', '@babel', '@emotion'],
     rules: {
         'prettier/prettier': ['error'],
         'import/no-dynamic-require': 0,

@@ -8,5 +8,5 @@
             "@FE/*": ["src/FrontEnd/*"]
         }
     },
-    "exclude": ["node_modules", "dist", "docs"]
+    "include": ["src/**/*", "**/*.*"]
 }

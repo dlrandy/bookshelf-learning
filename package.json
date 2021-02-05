@@ -15,10 +15,11 @@
     },
     "devDependencies": {
         "@babel/core": "7.12.10",
-        "@babel/eslint-parser": "7.12.1",
+        "@babel/eslint-parser": "7.12.13",
         "@babel/eslint-plugin": "7.12.13",
         "@babel/preset-env": "7.12.11",
         "@babel/preset-react": "7.12.10",
+        "@emotion/eslint-plugin": "11.0.0",
         "@testing-library/cypress": "7.0.3",
         "@testing-library/jest-dom": "5.11.9",
         "@testing-library/react": "11.2.3",
