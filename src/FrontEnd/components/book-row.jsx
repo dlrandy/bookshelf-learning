@@ -1,13 +1,18 @@
 /* eslint-disable react/prop-types */
-import React from 'react';
 /** @jsx jsx */
 import { jsx } from '@emotion/react';
 
+import { Link } from 'react-router-dom';
+import { useListItem } from '@FE/utils/list-items';
 import * as mq from '@FE/styles/media-queries';
 import * as colors from '@FE/styles/colors';
+import { StatusButtons } from '@FE/components/status-buttons';
+import { Rating } from './rating';
 
 function BookRow({ book }) {
     const { title, author, coverImageUrl } = book;
+
+    const listItem = useListItem(book.id);
 
     const id = `book-row-book-${book.id}`;
 
@@ -20,8 +25,9 @@ function BookRow({ book }) {
                 position: 'relative',
             }}
         >
-            <div
+            <Link
                 aria-labelledby={id}
+                to={`/book/${book.id}`}
                 css={{
                     minHeight: 270,
                     flexGrow: 2,
@@ -71,6 +77,9 @@ function BookRow({ book }) {
                             >
                                 {title}
                             </h2>
+                            {listItem?.finishDate ? (
+                                <Rating listItem={listItem} />
+                            ) : null}
                         </div>
                         <div css={{ marginLeft: 10 }}>
                             <div
@@ -91,6 +100,20 @@ function BookRow({ book }) {
                         {book.synopsis.substring(0, 500)}...
                     </small>
                 </div>
+            </Link>
+            <div
+                css={{
+                    marginLeft: '20px',
+                    position: 'absolute',
+                    right: -20,
+                    color: colors.gray80,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-around',
+                    height: '100%',
+                }}
+            >
+                <StatusButtons book={book} />
             </div>
         </div>
     );

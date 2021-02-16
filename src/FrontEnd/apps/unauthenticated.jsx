@@ -6,16 +6,27 @@ import { jsx } from '@emotion/react';
 import '@reach/dialog/styles.css';
 import { Logo } from '@FE/components/logo';
 import { Modal, ModalContents, ModalOpenButton } from '@FE/components/modal';
-import { Button, Input, FormGroup } from '@FE/components/lib';
+import {
+    Input,
+    Button,
+    Spinner,
+    FormGroup,
+    ErrorMessage,
+} from '@FE/components/lib';
+import { useAsync } from '@FE/utils/hooks';
+import { useAuth } from '@FE/context/auth-context';
 
 function LoginForm({ onSubmit, submitButton }) {
+    const { isLoading, isError, error, run } = useAsync();
     function handleSubmit(event) {
         event.preventDefault();
         const { username, password } = event.target.elements;
-        onSubmit({
-            username: username.value,
-            password: password.value,
-        });
+        run(
+            onSubmit({
+                username: username.value,
+                password: password.value,
+            })
+        );
     }
 
     return (
@@ -40,12 +51,23 @@ function LoginForm({ onSubmit, submitButton }) {
                 <label htmlFor="password">Password</label>
                 <Input id="password" type="password" />
             </FormGroup>
-            <div>{React.cloneElement(submitButton, { type: 'submit' })}</div>
+            <div>
+                {React.cloneElement(
+                    submitButton,
+                    { type: 'submit' },
+                    ...(Array.isArray(submitButton.props.children)
+                        ? submitButton.props.children
+                        : [submitButton.props.children]),
+                    isLoading ? <Spinner css={{ marginLeft: 5 }} /> : null
+                )}
+            </div>
+            {isError ? <ErrorMessage error={error} /> : null}
         </form>
     );
 }
 
-function UnauthenticatedApp({ login, register }) {
+function UnauthenticatedApp() {
+    const { login, register } = useAuth();
     return (
         <div
             css={{

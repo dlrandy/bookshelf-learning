@@ -1,27 +1,29 @@
 /* eslint-disable no-nested-ternary */
 /** @jsx jsx */
 import { jsx } from '@emotion/react';
-import React from 'react';
 
+import * as React from 'react';
 import Tooltip from '@reach/tooltip';
 import { FaSearch, FaTimes } from 'react-icons/fa';
-import { Input, BookListUL, Spinner } from '@FE/components/lib';
-import { BookRow } from '@FE/components/book-row';
-import { client } from '@FE/utils/api-client';
+import { useBookSearch, useRefetchBookSearchQuery } from '@FE/utils/books';
 import * as colors from '@FE/styles/colors';
-import { useAsync } from '@FE/utils/hooks';
+import { BookRow } from '@FE/components/book-row';
+import { BookListUL, Spinner, Input } from '@FE/components/lib';
 
 function DiscoverBooksScreen() {
-    const { data, error, run, isLoading, isError, isSuccess } = useAsync();
-    const [query, setQuery] = React.useState();
+    const [query, setQuery] = React.useState('');
     const [queried, setQueried] = React.useState(false);
+    const { books, error, status } = useBookSearch(query);
+    const refetchBookSearchQuery = useRefetchBookSearchQuery();
 
-    React.useEffect(() => {
-        if (!queried) {
-            return;
-        }
-        run(client(`books?query=${encodeURIComponent(query)}`));
-    }, [query, queried, run]);
+    React.useEffect(() => () => refetchBookSearchQuery(), [
+        refetchBookSearchQuery,
+    ]);
+
+    const isLoading = status === 'loading';
+    const isSuccess = status === 'success';
+    const isError = status === 'error';
+
     function handleSearchSubmit(event) {
         event.preventDefault();
         setQueried(true);
@@ -29,14 +31,7 @@ function DiscoverBooksScreen() {
     }
 
     return (
-        <div
-            css={{
-                maxWidth: 800,
-                margin: 'auto',
-                width: '90vw',
-                padding: '40px 0',
-            }}
-        >
+        <div>
             <form onSubmit={handleSearchSubmit}>
                 <Input
                     placeholder="Search books..."
@@ -75,11 +70,39 @@ function DiscoverBooksScreen() {
                     <pre>{error.message}</pre>
                 </div>
             ) : null}
-
+            <div>
+                {queried ? null : (
+                    <div
+                        css={{
+                            marginTop: 20,
+                            fontSize: '1.2em',
+                            textAlign: 'center',
+                        }}
+                    >
+                        <p>Welcome to the discover page.</p>
+                        <p>Here, let me load a few books for you...</p>
+                        {isLoading ? (
+                            <div css={{ width: '100%', margin: 'auto' }}>
+                                <Spinner />
+                            </div>
+                        ) : isSuccess && books.length ? (
+                            <p>
+                                Here you go! Find more books with the search bar
+                                above.
+                            </p>
+                        ) : isSuccess && !books.length ? (
+                            <p>
+                                Hmmm... I couldn't find any books to suggest for
+                                you. Sorry.
+                            </p>
+                        ) : null}
+                    </div>
+                )}
+            </div>
             {isSuccess ? (
-                data?.books?.length ? (
+                books.length ? (
                     <BookListUL css={{ marginTop: 20 }}>
-                        {data.books.map((book) => (
+                        {books.map((book) => (
                             <li key={book.id} aria-label={book.title}>
                                 <BookRow key={book.id} book={book} />
                             </li>

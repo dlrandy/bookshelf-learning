@@ -1,23 +1,44 @@
-/* eslint-disable react/prop-types */
 /* eslint-disable react/jsx-props-no-spreading */
-/* eslint-disable no-nested-ternary */
+/* eslint-disable react/destructuring-assignment */
+/* eslint-disable react/prop-types */
 /** @jsx jsx */
 import { jsx } from '@emotion/react';
-import React from 'react';
 
-import { Routes, Route, Link, useMatch } from 'react-router-dom';
-import { Button } from '@FE/components/lib';
-
-import * as colors from '@FE/styles/colors';
+import { Routes, Route, Link as RouterLink, useMatch } from 'react-router-dom';
+import { ErrorBoundary } from 'react-error-boundary';
+import {
+    Button,
+    ErrorMessage,
+    FullPageErrorFallback,
+} from '@FE/components/lib';
 import * as mq from '@FE/styles/media-queries';
-
+import * as colors from '@FE/styles/colors';
+import { useAuth } from '@FE/context/auth-context';
+import { ReadingListScreen } from '@FE/screens/reading-list';
+import { FinishedScreen } from '@FE/screens/finished';
 import { DiscoverBooksScreen } from '@FE/screens/discover';
-import { BookScreen } from '@FE/screens/books';
+import { BookScreen } from '@FE/screens/book';
 import { NotFoundScreen } from '@FE/screens/not-found';
 
-function AuthenticatedApp({ user, logout }) {
+function ErrorFallback({ error }) {
     return (
-        <React.Fragment>
+        <ErrorMessage
+            error={error}
+            css={{
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+            }}
+        />
+    );
+}
+
+function AuthenticatedApp() {
+    const { user, logout } = useAuth();
+    return (
+        <ErrorBoundary FallbackComponent={FullPageErrorFallback}>
             <div
                 css={{
                     display: 'flex',
@@ -56,16 +77,19 @@ function AuthenticatedApp({ user, logout }) {
                     <Nav />
                 </div>
                 <main css={{ width: '100%' }}>
-                    <AppRoutes user={user} />
+                    <ErrorBoundary FallbackComponent={ErrorFallback}>
+                        <AppRoutes user={user} />
+                    </ErrorBoundary>
                 </main>
             </div>
-        </React.Fragment>
+        </ErrorBoundary>
     );
 }
-function NavLink({ to, ...otherProps }) {
-    const match = useMatch(to);
+
+function NavLink(props) {
+    const match = useMatch(props.to);
     return (
-        <Link
+        <RouterLink
             css={[
                 {
                     display: 'block',
@@ -92,10 +116,11 @@ function NavLink({ to, ...otherProps }) {
                       }
                     : null,
             ]}
-            {...otherProps}
+            {...props}
         />
     );
 }
+
 function Nav() {
     return (
         <nav
@@ -118,20 +143,26 @@ function Nav() {
                 }}
             >
                 <li>
+                    <NavLink to="/list">Reading List</NavLink>
+                </li>
+                <li>
+                    <NavLink to="/finished">Finished Books</NavLink>
+                </li>
+                <li>
                     <NavLink to="/discover">Discover</NavLink>
                 </li>
             </ul>
         </nav>
     );
 }
-function AppRoutes({ user }) {
+
+function AppRoutes() {
     return (
         <Routes>
-            <Route
-                path="/discover"
-                element={<DiscoverBooksScreen user={user} />}
-            />
-            <Route path="/book/:bookId" element={<BookScreen user={user} />} />
+            <Route path="/list" element={<ReadingListScreen />} />
+            <Route path="/finished" element={<FinishedScreen />} />
+            <Route path="/discover" element={<DiscoverBooksScreen />} />
+            <Route path="/book/:bookId" element={<BookScreen />} />
             <Route path="*" element={<NotFoundScreen />} />
         </Routes>
     );
