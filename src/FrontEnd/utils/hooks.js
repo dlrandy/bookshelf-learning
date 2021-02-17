@@ -2,6 +2,7 @@
 /* eslint-disable no-void */
 /* eslint-disable no-return-assign */
 import React from 'react';
+import { wrap } from '@FE/components/profiler';
 
 function useSafeDispatch(dispatch) {
     const mounted = React.useRef(false);
@@ -59,14 +60,14 @@ function useAsync(initialState, reducer = (s, a) => ({ ...s, ...a })) {
             safeSetState({ status: 'pending' });
 
             return promise.then(
-                (data) => {
+                wrap((data) => {
                     setData(data);
                     return data;
-                },
-                (error) => {
+                }),
+                wrap((error) => {
                     setError(error);
                     return Promise.reject(error);
-                }
+                })
             );
         },
         [safeSetState, setData, setError]

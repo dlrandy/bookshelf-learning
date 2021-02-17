@@ -6,6 +6,7 @@ import ReactDOM from 'react-dom';
 // import { ReactQueryDevtools } from 'react-query/devtools';
 import App from '@FE/App';
 import { AppProviders } from '@FE/context';
+import { Profiler } from '@FE/components/profiler';
 if (process.env.NODE_ENV === 'production') {
     // 只在产品上出现的操作
 }
@@ -25,9 +26,11 @@ if (process.env.NODE_ENV === 'production') {
 
 function render(Comp) {
     ReactDOM.render(
-        <AppProviders>
-            <Comp />
-        </AppProviders>,
+        <Profiler id="App Root" phases={['mount']}>
+            <AppProviders>
+                <Comp />
+            </AppProviders>
+        </Profiler>,
         document.getElementById('app')
     );
 }

@@ -169,3 +169,4 @@ function AppRoutes() {
 }
 
 export { AuthenticatedApp };
+export default AuthenticatedApp;

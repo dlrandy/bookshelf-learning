@@ -22,12 +22,19 @@ import {
 import { useAsync } from '@FE/utils/hooks';
 import * as colors from '@FE/styles/colors';
 import { CircleButton, Spinner } from '@FE/components/lib';
+import { trace } from '@FE/components/profiler';
 
 function TooltipButton({ label, highlight, onClick, icon, ...rest }) {
-    const { isLoading, isError, error, run } = useAsync();
+    const { isLoading, isError, error, run, reset } = useAsync();
 
     function handleClick() {
-        run(onClick());
+        if (isError) {
+            reset();
+        } else {
+            trace(`Click ${label}`, performance.now(), () => {
+                run(onClick());
+            });
+        }
     }
 
     return (
@@ -54,15 +61,15 @@ function TooltipButton({ label, highlight, onClick, icon, ...rest }) {
     );
 }
 
-function StatusButtons({ user, book }) {
+function StatusButtons({ book }) {
     const listItem = useListItem(book.id);
-    const [update] = useUpdateListItem({
+    const [handleUpdateClick] = useUpdateListItem({
         throwOnError: true,
     });
-    const [remove] = useRemoveListItem({
+    const [handleRemoveClick] = useRemoveListItem({
         throwOnError: true,
     });
-    const [create] = useCreateListItem({
+    const [handleCreateClick] = useCreateListItem({
         throwOnError: true,
     });
 
@@ -74,7 +81,10 @@ function StatusButtons({ user, book }) {
                         label="Unmark as read"
                         highlight={colors.yellow}
                         onClick={() =>
-                            update({ id: listItem.id, finishDate: null })
+                            handleUpdateClick({
+                                id: listItem.id,
+                                finishDate: null,
+                            })
                         }
                         icon={<FaBook />}
                     />
@@ -83,7 +93,10 @@ function StatusButtons({ user, book }) {
                         label="Mark as read"
                         highlight={colors.green}
                         onClick={() =>
-                            update({ id: listItem.id, finishDate: Date.now() })
+                            handleUpdateClick({
+                                id: listItem.id,
+                                finishDate: Date.now(),
+                            })
                         }
                         icon={<FaCheckCircle />}
                     />
@@ -93,14 +106,14 @@ function StatusButtons({ user, book }) {
                 <TooltipButton
                     label="Remove from list"
                     highlight={colors.danger}
-                    onClick={() => remove({ id: listItem.id })}
+                    onClick={() => handleRemoveClick({ id: listItem.id })}
                     icon={<FaMinusCircle />}
                 />
             ) : (
                 <TooltipButton
                     label="Add to list"
                     highlight={colors.indigo}
-                    onClick={() => create({ bookId: book.id })}
+                    onClick={() => handleCreateClick({ bookId: book.id })}
                     icon={<FaPlusCircle />}
                 />
             )}

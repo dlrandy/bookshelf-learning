@@ -10,18 +10,19 @@ import { client } from '@FE/utils/api-client';
 import { useAsync } from '@FE/utils/hooks';
 import { FullPageSpinner, FullPageErrorFallback } from '@FE/components/lib';
 
-async function getUser() {
+async function bootstrapAppData() {
     let user = null;
 
     const token = await auth.getToken();
     if (token) {
-        const data = await client('me', { token });
+        const data = await client('bootstrap', { token });
+        queryCache.setQueryData('list-items', data.listItems, {
+            staleTime: 5000,
+        });
         user = data.user;
     }
-
     return user;
 }
-
 const AuthContext = React.createContext();
 AuthContext.displayName = 'AuthContext';
 
@@ -39,17 +40,30 @@ function AuthProvider(props) {
     } = useAsync();
 
     React.useEffect(() => {
-        run(getUser());
+        const appDataPromise = bootstrapAppData();
+        run(appDataPromise);
     }, [run]);
 
-    const login = (form) => auth.login(form).then((user) => setData(user));
-    const register = (form) =>
-        auth.register(form).then((user) => setData(user));
-    const logout = () => {
+    const login = React.useCallback(
+        (form) => auth.login(form).then((user) => setData(user)),
+        [setData]
+    );
+    const register = React.useCallback(
+        (form) => auth.register(form).then((user) => setData(user)),
+        [setData]
+    );
+    const logout = React.useCallback(() => {
         auth.logout();
-        queryCache.clear();
         setData(null);
-    };
+        queryCache.clear();
+    }, [setData]);
+
+    const value = React.useMemo(() => ({ user, login, logout, register }), [
+        login,
+        logout,
+        register,
+        user,
+    ]);
 
     if (isLoading || isIdle) {
         return <FullPageSpinner />;
@@ -60,7 +74,6 @@ function AuthProvider(props) {
     }
 
     if (isSuccess) {
-        const value = { user, login, register, logout };
         return <AuthContext.Provider value={value} {...props} />;
     }
 

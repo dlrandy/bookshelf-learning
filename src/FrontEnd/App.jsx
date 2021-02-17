@@ -6,12 +6,18 @@
 import { hot } from 'react-hot-loader/root';
 import React from 'react';
 import { useAuth } from '@FE/context/auth-context';
-import { AuthenticatedApp } from '@FE/apps/authenticated';
-import { UnauthenticatedApp } from '@FE/apps/unauthenticated';
+import { FullPageSpinner } from '@FE/components/lib';
+
+const AuthenticatedApp = React.lazy(() => import('@FE/apps/authenticated'));
+const UnauthenticatedApp = React.lazy(() => import('@FE/apps/unauthenticated'));
 
 function App() {
     const { user } = useAuth();
-    return user ? <AuthenticatedApp /> : <UnauthenticatedApp />;
+    return (
+        <React.Suspense fallback={<FullPageSpinner />}>
+            {user ? <AuthenticatedApp /> : <UnauthenticatedApp />}
+        </React.Suspense>
+    );
 }
 
 export default hot(App);

@@ -9,20 +9,19 @@ import { useBookSearch, useRefetchBookSearchQuery } from '@FE/utils/books';
 import * as colors from '@FE/styles/colors';
 import { BookRow } from '@FE/components/book-row';
 import { BookListUL, Spinner, Input } from '@FE/components/lib';
+import { Profiler } from '@FE/components/profiler';
 
 function DiscoverBooksScreen() {
     const [query, setQuery] = React.useState('');
     const [queried, setQueried] = React.useState(false);
-    const { books, error, status } = useBookSearch(query);
+    const { books, error, isLoading, isSuccess, isError } = useBookSearch(
+        query
+    );
     const refetchBookSearchQuery = useRefetchBookSearchQuery();
 
     React.useEffect(() => () => refetchBookSearchQuery(), [
         refetchBookSearchQuery,
     ]);
-
-    const isLoading = status === 'loading';
-    const isSuccess = status === 'success';
-    const isError = status === 'error';
 
     function handleSearchSubmit(event) {
         event.preventDefault();
@@ -32,44 +31,46 @@ function DiscoverBooksScreen() {
 
     return (
         <div>
-            <form onSubmit={handleSearchSubmit}>
-                <Input
-                    placeholder="Search books..."
-                    id="search"
-                    css={{ width: '100%' }}
-                />
-                <Tooltip label="Search Books">
-                    <label htmlFor="search">
-                        <button
-                            type="submit"
-                            css={{
-                                border: '0',
-                                position: 'relative',
-                                marginLeft: '-35px',
-                                background: 'transparent',
-                            }}
-                        >
-                            {isLoading ? (
-                                <Spinner />
-                            ) : isError ? (
-                                <FaTimes
-                                    aria-label="error"
-                                    css={{ color: colors.danger }}
-                                />
-                            ) : (
-                                <FaSearch aria-label="search" />
-                            )}
-                        </button>
-                    </label>
-                </Tooltip>
-            </form>
+            <div>
+                <form onSubmit={handleSearchSubmit}>
+                    <Input
+                        placeholder="Search books..."
+                        id="search"
+                        css={{ width: '100%' }}
+                    />
+                    <Tooltip label="Search Books">
+                        <label htmlFor="search">
+                            <button
+                                type="submit"
+                                css={{
+                                    border: '0',
+                                    position: 'relative',
+                                    marginLeft: '-35px',
+                                    background: 'transparent',
+                                }}
+                            >
+                                {isLoading ? (
+                                    <Spinner />
+                                ) : isError ? (
+                                    <FaTimes
+                                        aria-label="error"
+                                        css={{ color: colors.danger }}
+                                    />
+                                ) : (
+                                    <FaSearch aria-label="search" />
+                                )}
+                            </button>
+                        </label>
+                    </Tooltip>
+                </form>
 
-            {isError ? (
-                <div css={{ color: colors.danger }}>
-                    <p>There was an error:</p>
-                    <pre>{error.message}</pre>
-                </div>
-            ) : null}
+                {isError ? (
+                    <div css={{ color: colors.danger }}>
+                        <p>There was an error:</p>
+                        <pre>{error.message}</pre>
+                    </div>
+                ) : null}
+            </div>
             <div>
                 {queried ? null : (
                     <div
@@ -98,20 +99,26 @@ function DiscoverBooksScreen() {
                         ) : null}
                     </div>
                 )}
+
+                {isSuccess ? (
+                    books.length ? (
+                        <Profiler
+                            id="Discover Books Screen Book List"
+                            metadata={{ query, bookCount: books.length }}
+                        >
+                            <BookListUL css={{ marginTop: 20 }}>
+                                {books.map((book) => (
+                                    <li key={book.id} aria-label={book.title}>
+                                        <BookRow key={book.id} book={book} />
+                                    </li>
+                                ))}
+                            </BookListUL>
+                        </Profiler>
+                    ) : (
+                        <p>No books found. Try another search.</p>
+                    )
+                ) : null}
             </div>
-            {isSuccess ? (
-                books.length ? (
-                    <BookListUL css={{ marginTop: 20 }}>
-                        {books.map((book) => (
-                            <li key={book.id} aria-label={book.title}>
-                                <BookRow key={book.id} book={book} />
-                            </li>
-                        ))}
-                    </BookListUL>
-                ) : (
-                    <p>No books found. Try another search.</p>
-                )
-            ) : null}
         </div>
     );
 }
