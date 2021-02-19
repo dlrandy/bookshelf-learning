@@ -9,7 +9,7 @@
         "lint": "eslint . --fix",
         "startB": " babel-node src/BackEnd/index.js",
         "testF": "is-ci \"testF:coverage\" \"testF:watch\"",
-        "testF:watch": "jest --watch",
+        "testF:watch": "jest --config ./src/FrontEnd/jest.config.js --watch",
         "testF:coverage": "jest --watch=false --coverage",
         "testF:debug": "node --inspect-brk ./node_modules/jest/bin/jest.js --watch --runInBand"
     },
